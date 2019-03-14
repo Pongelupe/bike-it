@@ -9,6 +9,7 @@ public class App {
 		StravaService stravaService = new StravaService();
 		Auth oauthToken = stravaService.getOauthToken();
 		System.out.println(oauthToken);
+		System.out.println(stravaService.exploreSegments());
 		System.exit(0);
 	}
 }
