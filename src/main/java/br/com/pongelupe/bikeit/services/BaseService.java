@@ -14,7 +14,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class BaseService {
-	
+
 	protected static final String BASE_URL = "https://www.strava.com/api/v3/";
 	protected OkHttpClient client;
 	protected ObjectMapper mapper = new ObjectMapper();
@@ -30,7 +30,11 @@ public class BaseService {
 		Response response = null;
 		try {
 			response = call.execute();
-			return mapper.readValue(response.body().bytes(), reponseBody);
+			if (response.isSuccessful()) {
+				return mapper.readValue(response.body().bytes(), reponseBody);
+			} else {
+				throw new RequestException(request, response);				
+			}
 		} catch (IOException e) {
 			throw new RequestException(request, response);
 		}

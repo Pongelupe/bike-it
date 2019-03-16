@@ -25,7 +25,7 @@ public class App {
 			retriveAuth(stravaService);
 			System.out.println(stravaService.exploreSegments());
 		} catch (RequestException e) {
-			e.printStackTrace();
+			LOGGER.severe("Eror requesting " + e.getMessage());
 		} finally {
 			System.exit(0);
 		}
