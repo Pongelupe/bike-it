@@ -31,10 +31,9 @@ public class PropertyService implements IPropertyService {
 	}
 
 	@Override
-	public String getProp(String propKey) {
+	public Optional<String> getProp(String propKey) {
 		return Optional.ofNullable(this.prop.get(propKey))
-				.map(Object::toString)
-				.orElse(null);
+				.map(Object::toString);
 	}
 
 	@Override

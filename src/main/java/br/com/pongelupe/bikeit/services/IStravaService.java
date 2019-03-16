@@ -9,7 +9,9 @@ import br.com.pongelupe.bikeit.model.Segment;
 public interface IStravaService {
 
 	Auth getOauthToken() throws RequestException;
-	
+
+	void setTokenOnRequestHeader(Auth auth);
+
 	List<Segment> exploreSegments() throws RequestException;
 
 }

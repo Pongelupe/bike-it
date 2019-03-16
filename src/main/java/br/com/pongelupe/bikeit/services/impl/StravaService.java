@@ -18,9 +18,9 @@ public class StravaService extends BaseService implements IStravaService {
 	@Override
 	public Auth getOauthToken() throws RequestException {
 		Request request = new Request.Builder().url(BASE_URL + "oauth/token")
-				.post(new FormBody.Builder().add("client_id", propertyService.getProp("client_id"))
-						.add("client_secret", propertyService.getProp("client_secret"))
-						.add("code", propertyService.getProp("code")).build())
+				.post(new FormBody.Builder().add("client_id", propertyService.getProp("client_id").orElseThrow())
+						.add("client_secret", propertyService.getProp("client_secret").orElseThrow())
+						.add("code", propertyService.getProp("code").orElseThrow()).build())
 				.build();
 		Auth auth = doRequest(request, Auth.class);
 		setTokenOnRequestHeader(auth);
@@ -35,6 +35,11 @@ public class StravaService extends BaseService implements IStravaService {
 		}
 		return auth;
 
+	}
+	
+	@Override
+	public void setTokenOnRequestHeader(Auth auth) {
+		super.setTokenOnRequestHeader(auth);
 	}
 
 	@Override

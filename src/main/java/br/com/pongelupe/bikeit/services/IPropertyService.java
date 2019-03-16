@@ -1,10 +1,11 @@
 package br.com.pongelupe.bikeit.services;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public interface IPropertyService {
 
-	String getProp(String propKey);
+	Optional<String> getProp(String propKey);
 	
 	void setProp(String propKey, String value);
 	
