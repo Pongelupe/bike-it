@@ -1,11 +1,14 @@
 package br.com.pongelupe.bikeit;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
+import br.com.pongelupe.bikeit.dao.impl.SegmentDAO;
 import br.com.pongelupe.bikeit.exceptions.BikeItException;
 import br.com.pongelupe.bikeit.exceptions.RequestException;
 import br.com.pongelupe.bikeit.model.Auth;
+import br.com.pongelupe.bikeit.model.Segment;
 import br.com.pongelupe.bikeit.services.IPropertyService;
 import br.com.pongelupe.bikeit.services.IStravaService;
 import br.com.pongelupe.bikeit.services.impl.PropertyService;
@@ -22,10 +25,13 @@ public class App {
 
 	public static void main(String... args) {
 		try {
+			SegmentDAO segmentDAO = new SegmentDAO();
 			IStravaService stravaService = new StravaService();
 			retriveAuth(stravaService);
-			System.out.println(stravaService
-					.exploreSegments(Arrays.asList("-19.972729", "-44.024416", "-19.802463", "-43.909215")));
+			List<Segment> segments = stravaService
+					.exploreSegments(Arrays.asList("-19.972729", "-44.024416", "-19.802463", "-43.909215"));
+			System.out.println(segments);
+			segmentDAO.persistAll(segments);
 		} catch (RequestException e) {
 			LOGGER.severe("Eror requesting " + e.getMessage());
 		} finally {
@@ -49,10 +55,10 @@ public class App {
 					.orElseThrow(() -> new BikeItException("auth.token_type not found!"));
 			String token = propertyService.getProp("auth.token")
 					.orElseThrow(() -> new BikeItException("auth.token not found!"));
-			LOGGER.fine("Auth object retrive from properties");
+			LOGGER.info("Auth object retrive from properties");
 			stravaService.setTokenOnRequestHeader(new Auth(tokenType, token));
 		} catch (BikeItException e) {
-			LOGGER.fine(e.getMessage());
+			LOGGER.info(e.getMessage());
 			stravaService.getOauthToken();
 		}
 	}
