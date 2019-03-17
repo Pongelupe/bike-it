@@ -1,5 +1,6 @@
 package br.com.pongelupe.bikeit;
 
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import br.com.pongelupe.bikeit.exceptions.BikeItException;
@@ -23,7 +24,8 @@ public class App {
 		try {
 			IStravaService stravaService = new StravaService();
 			retriveAuth(stravaService);
-			System.out.println(stravaService.exploreSegments());
+			System.out.println(stravaService
+					.exploreSegments(Arrays.asList("-19.972729", "-44.024416", "-19.802463", "-43.909215")));
 		} catch (RequestException e) {
 			LOGGER.severe("Eror requesting " + e.getMessage());
 		} finally {
@@ -34,8 +36,8 @@ public class App {
 	/**
 	 * This method retrieves the Auth for the HTTP request and sets it on the HTTP
 	 * header for future requests. It first tries to recover from
-	 * bike-it.properties. Case the property was not set yet, it searches from the
-	 * Strava v3 API
+	 * bike-it.properties. Case the property was not set yet, it searches from
+	 * Strava's v3 API
 	 * 
 	 * @param stravaService
 	 * @throws RequestException - when tries to request to retrieve the HTTP token
@@ -50,7 +52,7 @@ public class App {
 			LOGGER.fine("Auth object retrive from properties");
 			stravaService.setTokenOnRequestHeader(new Auth(tokenType, token));
 		} catch (BikeItException e) {
-			LOGGER.severe(e.getMessage());
+			LOGGER.fine(e.getMessage());
 			stravaService.getOauthToken();
 		}
 	}
