@@ -49,7 +49,7 @@ public class BaseService {
 	 * @param auth
 	 */
 	protected void setTokenOnRequestHeader(Auth auth) {
-		client = client.newBuilder().readTimeout(15, TimeUnit.SECONDS).addInterceptor(chain -> {
+		client = client.newBuilder().readTimeout(60, TimeUnit.SECONDS).addInterceptor(chain -> {
 			Request original = chain.request();
 
 			Request request = original.newBuilder().header("User-Agent", "Bike-It")

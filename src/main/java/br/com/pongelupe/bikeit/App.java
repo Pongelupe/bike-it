@@ -30,8 +30,8 @@ public class App {
 			retriveAuth(stravaService);
 			List<Segment> segments = stravaService
 					.exploreSegments(Arrays.asList("-19.972729", "-44.024416", "-19.802463", "-43.909215"));
-			System.out.println(segments);
-			segmentDAO.persistAll(segments);
+			LOGGER.info(() -> segments.size() + " segments found!");
+			segmentDAO.persistAllIfNotExists(segments);
 		} catch (RequestException e) {
 			LOGGER.severe("Eror requesting " + e.getMessage());
 		} finally {

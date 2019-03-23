@@ -8,4 +8,6 @@ package br.com.pongelupe.bikeit.dao;
  */
 public interface BaseEntity {
 
+	int getId();
+
 }
