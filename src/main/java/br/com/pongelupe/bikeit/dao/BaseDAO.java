@@ -58,7 +58,7 @@ public class BaseDAO<T extends BaseEntity> {
 
 	public T persistIfNotExists(T target) {
 		em.getTransaction().begin();
-		if (!em.contains(target)) {
+		if (notExists(target)) {
 			em.persist(target);
 		}
 		em.getTransaction().commit();

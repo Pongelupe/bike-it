@@ -2,6 +2,7 @@ package br.com.pongelupe.bikeit.services;
 
 import java.util.List;
 
+import br.com.pongelupe.bikeit.dtos.SegmentExploreDTO;
 import br.com.pongelupe.bikeit.exceptions.RequestException;
 import br.com.pongelupe.bikeit.model.Auth;
 import br.com.pongelupe.bikeit.model.Segment;
@@ -53,6 +54,8 @@ public interface IStravaService {
 	 * @return List<{@link Segment}> - the segments defined within the passed bounds
 	 * @throws RequestException
 	 */
-	List<Segment> exploreSegments(List<String> bounds) throws RequestException;
+	List<SegmentExploreDTO> exploreSegments(List<String> bounds) throws RequestException;
+
+	Segment getSegment(int idSegment) throws RequestException;
 
 }

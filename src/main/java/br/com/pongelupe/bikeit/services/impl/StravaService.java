@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import br.com.pongelupe.bikeit.dtos.SegmentDTO;
+import br.com.pongelupe.bikeit.dtos.SegmentExploreDTO;
+import br.com.pongelupe.bikeit.dtos.SegmentsDTO;
 import br.com.pongelupe.bikeit.exceptions.RequestException;
 import br.com.pongelupe.bikeit.model.Auth;
 import br.com.pongelupe.bikeit.model.Segment;
-import br.com.pongelupe.bikeit.model.Segments;
 import br.com.pongelupe.bikeit.services.BaseService;
 import br.com.pongelupe.bikeit.services.IStravaService;
 import okhttp3.FormBody;
@@ -44,13 +46,13 @@ public class StravaService extends BaseService implements IStravaService {
 	}
 
 	@Override
-	public List<Segment> exploreSegments(List<String> bounds) throws RequestException {
+	public List<SegmentExploreDTO> exploreSegments(List<String> bounds) throws RequestException {
 		Request request = new Request.Builder().url(new HttpUrl.Builder().scheme("https").host("www.strava.com")
 				.addPathSegment("api").addPathSegment("v3").addPathSegment("segments").addPathSegment("explore")
 				.addQueryParameter("bounds", boundsToQueryParameter(bounds))
 				.addQueryParameter("activity_type", "riding").addQueryParameter("min_cat", "0")
 				.addQueryParameter("max_cat", "5600").build()).get().build();
-		return doRequest(request, Segments.class).getSegments();
+		return doRequest(request, SegmentsDTO.class).getSegments();
 	}
 
 	private String boundsToQueryParameter(List<String> bounds) {
@@ -59,6 +61,14 @@ public class StravaService extends BaseService implements IStravaService {
 		} else {
 			return bounds.stream().collect(Collectors.joining(","));
 		}
+	}
+
+	@Override
+	public Segment getSegment(int idSegment) throws RequestException {
+		Request request = new Request.Builder().url(
+				new HttpUrl.Builder().scheme("https").host("www.strava.com").addPathSegment("api").addPathSegment("v3")
+						.addPathSegment("segments").addPathSegment(String.valueOf(idSegment)).build()).get().build();
+		return doRequest(request, SegmentDTO.class).toSegment();
 	}
 
 }
