@@ -1,6 +1,7 @@
 package br.com.pongelupe.bikeit.dao;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -57,9 +58,15 @@ public class BaseDAO<T extends BaseEntity> {
 	}
 
 	public T persistIfNotExists(T target) {
+		return persistIfNotExistsElse(target, t -> {}); 
+	}
+
+	public T persistIfNotExistsElse(T target, Consumer<T> then) {
 		em.getTransaction().begin();
 		if (notExists(target)) {
 			em.persist(target);
+		} else {
+			then.accept(target);
 		}
 		em.getTransaction().commit();
 		return target;

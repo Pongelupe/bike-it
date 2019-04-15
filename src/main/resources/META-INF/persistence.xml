@@ -6,6 +6,7 @@
 	<persistence-unit name="bikeit">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		<class>br.com.pongelupe.bikeit.model.Segment</class>
+		<class>br.com.pongelupe.bikeit.model.SegmentHistorical</class>
 		<properties>
 			<!-- Dados da conexão com o banco -->
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import br.com.pongelupe.bikeit.dao.impl.SegmentDAO;
+import br.com.pongelupe.bikeit.dao.impl.SegmentHistoricalDAO;
 import br.com.pongelupe.bikeit.dtos.SegmentExploreDTO;
 import br.com.pongelupe.bikeit.exceptions.BikeItException;
 import br.com.pongelupe.bikeit.exceptions.RequestException;
@@ -27,17 +28,18 @@ public class App {
 	public static void main(String... args) {
 		try {
 			SegmentDAO segmentDAO = new SegmentDAO();
+			SegmentHistoricalDAO segmentHistoricalDAO = new SegmentHistoricalDAO();
 			IStravaService stravaService = new StravaService();
 			retriveAuth(stravaService);
 			List<SegmentExploreDTO> exploreSegments = stravaService
 					.exploreSegments(Arrays.asList("-19.972729", "-44.024416", "-19.802463", "-43.909215"));
 			LOGGER.info(() -> exploreSegments.size() + " segments found!");
 
-			exploreSegments.parallelStream().forEach(segmentExplored -> {
+			exploreSegments.stream().forEach(segmentExplored -> {
 				Segment segment;
 				try {
 					segment = stravaService.getSegment(segmentExplored.getId());
-					segmentDAO.persistIfNotExists(segment);
+					segmentDAO.persistIfNotExistsElse(segment, s -> segmentHistoricalDAO.persistIfNotExists(s.toHistorical()));
 				} catch (RequestException e) {
 					LOGGER.severe("Eror requesting " + e.getMessage());
 				}
