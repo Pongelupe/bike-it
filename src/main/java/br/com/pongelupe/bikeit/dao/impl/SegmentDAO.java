@@ -11,4 +11,8 @@ import br.com.pongelupe.bikeit.model.Segment;
  */
 public class SegmentDAO extends BaseDAO<Segment> {
 
+	public SegmentDAO() {
+		super(Segment.class);
+	}
+
 }

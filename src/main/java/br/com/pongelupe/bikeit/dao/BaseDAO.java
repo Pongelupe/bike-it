@@ -1,6 +1,7 @@
 package br.com.pongelupe.bikeit.dao;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.persistence.EntityManager;
@@ -20,10 +21,12 @@ import javax.persistence.criteria.Root;
 public class BaseDAO<T extends BaseEntity> {
 
 	protected EntityManager em;
+	protected Class<T> clazz;
 
-	public BaseDAO() {
+	public BaseDAO(Class<T> clazz) {
 		EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("bikeit");
 		em = entityManagerFactory.createEntityManager();
+		this.clazz = clazz;
 	}
 
 	protected CriteriaBuilder getCb() {
@@ -57,8 +60,17 @@ public class BaseDAO<T extends BaseEntity> {
 		return target;
 	}
 
+	public Optional<T> findById(int id) {
+		em.getTransaction().begin();
+		T entity = em.find(clazz, id);
+		em.getTransaction().commit();
+
+		return Optional.ofNullable(entity);
+	}
+
 	public T persistIfNotExists(T target) {
-		return persistIfNotExistsElse(target, t -> {}); 
+		return persistIfNotExistsElse(target, t -> {
+		});
 	}
 
 	public T persistIfNotExistsElse(T target, Consumer<T> then) {

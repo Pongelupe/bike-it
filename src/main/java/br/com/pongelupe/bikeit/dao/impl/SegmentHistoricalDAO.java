@@ -16,6 +16,10 @@ import br.com.pongelupe.bikeit.model.SegmentHistorical;
  */
 public class SegmentHistoricalDAO extends BaseDAO<SegmentHistorical> {
 
+	public SegmentHistoricalDAO() {
+		super(SegmentHistorical.class);
+	}
+	
 	@Override
 	public boolean exists(SegmentHistorical entity) {
 		CriteriaQuery<Integer> cq = getCb().createQuery(Integer.class);
