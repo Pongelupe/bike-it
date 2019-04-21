@@ -16,10 +16,10 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Region implements BaseEntity {
+public class Region implements BaseEntity<Integer> {
 
 	@Id
-	private int id;
+	private Integer id;
 
 	@Column(name = "des_region", length = 30, nullable = false)
 	private String descriptionRegion;

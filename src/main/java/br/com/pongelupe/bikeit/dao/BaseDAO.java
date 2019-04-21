@@ -18,7 +18,7 @@ import javax.persistence.criteria.Root;
  *
  * @param <T>
  */
-public class BaseDAO<T extends BaseEntity> {
+public class BaseDAO<T extends BaseEntity<?>> {
 
 	protected EntityManager em;
 	protected Class<T> clazz;
@@ -91,6 +91,14 @@ public class BaseDAO<T extends BaseEntity> {
 		return target;
 	}
 
+	public T update(T target) {
+		em.getTransaction().begin();
+		em.merge(target);
+		em.getTransaction().commit();
+		return target;
+	}
+
+	@SuppressWarnings("rawtypes")
 	public boolean exists(T entity) {
 		CriteriaQuery<Integer> cq = getCb().createQuery(Integer.class);
 		Root<? extends BaseEntity> from = cq.from(entity.getClass());

@@ -2,6 +2,7 @@ package br.com.pongelupe.bikeit.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,11 +26,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-public class Search implements BaseEntity {
+public class Search implements BaseEntity<Integer> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 
 	@Temporal(value = TemporalType.TIMESTAMP)
 	private Date searchAt;
@@ -37,9 +38,15 @@ public class Search implements BaseEntity {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "id_region")
 	private Region region;
+	
+	@Column(name = "id_region", insertable = false, updatable = false)
+	private int regionId;
+	
+	private boolean completed;
 
 	public Search(Region region) {
 		this.region = region;
+		this.searchAt = new Date();
 	}
 
 }

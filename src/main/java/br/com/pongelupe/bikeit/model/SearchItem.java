@@ -1,5 +1,8 @@
 package br.com.pongelupe.bikeit.model;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,7 +12,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import br.com.pongelupe.bikeit.dao.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The persistent entity for SearchItem
@@ -21,11 +27,14 @@ import lombok.Data;
 @Entity
 @Table(name = "search_item")
 @Data
-public class SearchItem implements BaseEntity {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SearchItem implements BaseEntity<Integer> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "id_search")
@@ -40,4 +49,12 @@ public class SearchItem implements BaseEntity {
 	private Coordinates finalCoord;
 
 	private double distance;
+	
+	private boolean processed;
+
+	public List<String> getBounds() {
+		return Arrays.asList(String.valueOf(initialCoord.getXcoord()), String.valueOf(initialCoord.getYcoord()),
+				String.valueOf(finalCoord.getXcoord()), String.valueOf(finalCoord.getYcoord()));
+	}
+
 }

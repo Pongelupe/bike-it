@@ -6,7 +6,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import br.com.pongelupe.bikeit.dao.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The persistent entity for Coordinates
@@ -17,11 +19,13 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Coordinates implements BaseEntity {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Coordinates implements BaseEntity<Integer> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 
 	private Double xcoord;
 	private Double ycoord;

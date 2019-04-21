@@ -23,7 +23,7 @@ public class SegmentHistoricalDAO extends BaseDAO<SegmentHistorical> {
 	@Override
 	public boolean exists(SegmentHistorical entity) {
 		CriteriaQuery<Integer> cq = getCb().createQuery(Integer.class);
-		Root<? extends BaseEntity> from = cq.from(entity.getClass());
+		Root<? extends BaseEntity<Integer>> from = cq.from(entity.getClass());
 
 		cq.select(getCb().literal(1)).where(getCb().equal(from.get("updatedAt"), entity.getUpdatedAt()));
 

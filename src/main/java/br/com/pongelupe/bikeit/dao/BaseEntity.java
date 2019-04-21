@@ -6,8 +6,9 @@ package br.com.pongelupe.bikeit.dao;
  * @author pongelupe
  *
  */
-public interface BaseEntity {
+public interface BaseEntity<T> {
 
-	int getId();
+	T getId();
 
+	void setId(T id);
 }

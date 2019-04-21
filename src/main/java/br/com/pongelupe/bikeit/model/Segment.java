@@ -30,10 +30,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class Segment implements BaseEntity {
+public class Segment implements BaseEntity<Integer> {
 
 	@Id
-	private int id;
+	private Integer id;
 	@Column(name = "name", length = 50)
 	private String name;
 	private double distance;

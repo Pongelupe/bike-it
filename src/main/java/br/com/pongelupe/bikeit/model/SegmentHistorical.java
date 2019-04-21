@@ -28,11 +28,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SegmentHistorical implements BaseEntity {
+public class SegmentHistorical implements BaseEntity<Integer> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 
 	@Temporal(value = TemporalType.TIMESTAMP)
 	private Date updatedAt;

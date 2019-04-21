@@ -1,15 +1,26 @@
 package br.com.pongelupe.bikeit;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
+import br.com.pongelupe.bikeit.dao.impl.CoordinatesDAO;
+import br.com.pongelupe.bikeit.dao.impl.RegionDAO;
+import br.com.pongelupe.bikeit.dao.impl.SearchDAO;
+import br.com.pongelupe.bikeit.dao.impl.SearchItemDAO;
+import br.com.pongelupe.bikeit.dao.impl.SearchItemXSegmentDAO;
 import br.com.pongelupe.bikeit.dao.impl.SegmentDAO;
 import br.com.pongelupe.bikeit.dao.impl.SegmentHistoricalDAO;
 import br.com.pongelupe.bikeit.dtos.SegmentExploreDTO;
 import br.com.pongelupe.bikeit.exceptions.BikeItException;
 import br.com.pongelupe.bikeit.exceptions.RequestException;
 import br.com.pongelupe.bikeit.model.Auth;
+import br.com.pongelupe.bikeit.model.Region;
+import br.com.pongelupe.bikeit.model.Search;
+import br.com.pongelupe.bikeit.model.SearchItem;
+import br.com.pongelupe.bikeit.model.SearchItemXSegment;
+import br.com.pongelupe.bikeit.model.SearchItemXSegmentId;
 import br.com.pongelupe.bikeit.model.Segment;
 import br.com.pongelupe.bikeit.services.IPropertyService;
 import br.com.pongelupe.bikeit.services.IStravaService;
@@ -26,30 +37,66 @@ public class App {
 	private static final Logger LOGGER = Logger.getLogger(App.class.getName());
 
 	public static void main(String... args) {
-		try {
-			SegmentDAO segmentDAO = new SegmentDAO();
-			SegmentHistoricalDAO segmentHistoricalDAO = new SegmentHistoricalDAO();
-			IStravaService stravaService = new StravaService();
-			retriveAuth(stravaService);
-			List<SegmentExploreDTO> exploreSegments = stravaService
-					.exploreSegments(Arrays.asList("-19.972729", "-44.024416", "-19.802463", "-43.909215"));
-			LOGGER.info(() -> exploreSegments.size() + " segments found!");
+		int idRegion = Integer.parseInt(args[0]);
+		Optional<Region> regionOptional = new RegionDAO().findById(idRegion);
 
-			exploreSegments.stream().forEach(segmentExplored -> {
-				Segment segment;
-				try {
-					segment = stravaService.getSegment(segmentExplored.getId());
-					segmentDAO.persistIfNotExistsElse(segment, s -> segmentHistoricalDAO.persistIfNotExists(s.toHistorical()));
-				} catch (RequestException e) {
-					LOGGER.severe("Eror requesting " + e.getMessage());
-				}
-			});
+		SearchDAO searchDAO = new SearchDAO();
+		Region region = regionOptional.orElseThrow();
+		boolean existsOngoing = searchDAO.existsOngoing(region.getId());
+		SearchItemDAO searchItemDAO = new SearchItemDAO();
 
-		} catch (RequestException e) {
-			LOGGER.severe("Eror requesting " + e.getMessage());
-		} finally {
-			System.exit(0);
+		List<SearchItem> itemsSearch = new ArrayList<>();
+		Search search = existsOngoing ? searchDAO.findOngoingByIdRegion(region.getId())
+				: searchDAO.persist(new Search(region));
+		if (existsOngoing) {
+			itemsSearch = searchItemDAO.findItemsToBeProcessed(search.getId());
+		} else {
+			itemsSearch = new CoordinatesDAO().prepareCoordinatesForSearchItemByRegion(idRegion);
+			itemsSearch.forEach(item -> item.setSearch(search));
+			searchItemDAO.persistAll(itemsSearch);
+			itemsSearch = itemsSearch.size() > 55 ? itemsSearch.subList(0, 54) : itemsSearch;
 		}
+
+		SegmentHistoricalDAO segmentHistoricalDAO = new SegmentHistoricalDAO();
+		SegmentDAO segmentDAO = new SegmentDAO();
+
+		SearchItemXSegmentDAO searchItemXSegmentDAO = new SearchItemXSegmentDAO();
+		IStravaService stravaService = new StravaService();
+		itemsSearch.forEach(item -> {
+			boolean processed = true;
+			try {
+				retriveAuth(stravaService);
+				List<SegmentExploreDTO> exploreSegments = stravaService.exploreSegments(item.getBounds());
+				LOGGER.info(() -> exploreSegments.size() + " segments found @ " + item.getBounds());
+
+				exploreSegments.stream().forEach(segmentExplored -> {
+					Segment segment;
+					try {
+						segment = stravaService.getSegment(segmentExplored.getId());
+						segmentDAO.persistIfNotExistsElse(segment,
+								s -> segmentHistoricalDAO.persistIfNotExists(s.toHistorical()));
+						searchItemXSegmentDAO.persist(
+								new SearchItemXSegment(new SearchItemXSegmentId(item.getId(), search.getId())));
+					} catch (RequestException e) {
+						LOGGER.severe("Eror requesting " + e.getMessage());
+					}
+				});
+
+			} catch (RequestException e) {
+				LOGGER.severe("Eror requesting " + e.getMessage());
+				processed = false;
+			} finally {
+				item.setSearch(search);
+				item.setProcessed(processed);
+				searchItemDAO.persist(item);
+			}
+		});
+		if (itemsSearch.isEmpty()) {
+			search.setCompleted(true);
+			searchDAO.update(search);
+		}
+		System.exit(0);
+
 	}
 
 	/**
