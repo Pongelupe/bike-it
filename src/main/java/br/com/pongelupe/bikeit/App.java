@@ -67,7 +67,8 @@ public class App {
 			try {
 				retriveAuth(stravaService);
 				List<SegmentExploreDTO> exploreSegments = stravaService.exploreSegments(item.getBounds());
-				LOGGER.info(() -> exploreSegments.size() + " segments found @ " + item.getBounds());
+				LOGGER.info(() -> exploreSegments.size() + " segments found @ " + item.getBounds() + "- "
+						+ item.getDistance());
 
 				exploreSegments.stream().forEach(segmentExplored -> {
 					Segment segment;
