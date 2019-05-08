@@ -49,12 +49,31 @@ public class SearchItem implements BaseEntity<Integer> {
 	private Coordinates finalCoord;
 
 	private double distance;
-	
+
 	private boolean processed;
 
 	public List<String> getBounds() {
-		return Arrays.asList(String.valueOf(initialCoord.getXcoord()), String.valueOf(initialCoord.getYcoord()),
-				String.valueOf(finalCoord.getXcoord()), String.valueOf(finalCoord.getYcoord()));
+		var upperInitialY = initialCoord.getYcoord() > finalCoord.getYcoord();
+		var upperInitialX = initialCoord.getXcoord() > finalCoord.getXcoord();
+
+		var initialCoordPoint = new String[2];
+		var finalCoordPoint = new String[2];
+
+		if (upperInitialY && upperInitialX) {
+			initialCoordPoint[0] = String.valueOf(finalCoord.getYcoord());
+			initialCoordPoint[1] = String.valueOf(finalCoord.getXcoord());
+
+			finalCoordPoint[0] = String.valueOf(initialCoord.getYcoord());
+			finalCoordPoint[1] = String.valueOf(initialCoord.getXcoord());
+		} else if (!upperInitialY && !upperInitialX) {
+			initialCoordPoint[0] = String.valueOf(initialCoord.getYcoord());
+			initialCoordPoint[1] = String.valueOf(initialCoord.getXcoord());
+
+			finalCoordPoint[0] = String.valueOf(finalCoord.getYcoord());
+			finalCoordPoint[1] = String.valueOf(finalCoord.getXcoord());
+		}
+
+		return Arrays.asList(initialCoordPoint[0], initialCoordPoint[1], finalCoordPoint[0], finalCoordPoint[1]);
 	}
 
 }

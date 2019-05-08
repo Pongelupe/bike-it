@@ -34,7 +34,7 @@ public class Segment implements BaseEntity<Integer> {
 
 	@Id
 	private Integer id;
-	@Column(name = "name", length = 50)
+	@Column(name = "name", length = 150)
 	private String name;
 	private double distance;
 

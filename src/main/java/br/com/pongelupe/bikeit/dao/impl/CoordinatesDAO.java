@@ -26,12 +26,11 @@ public class CoordinatesDAO extends BaseDAO<Coordinates> {
 	public List<SearchItem> prepareCoordinatesForSearchItemByRegion(int idRegion) {
 		StringBuilder sql = new StringBuilder();
 
-		sql.append("SELECT DISTINCT ON (a.id) a.id, a.xcoord xa, a.ycoord ya, b.id idb, b.xcoord xb, b.ycoord yb, ");
-		sql.append("ST_DISTANCESPHERE(a.geom, b.geom) AS d ");
-		sql.append("FROM  coordinates a JOIN coordinates b ON ");
-		sql.append("a.ycoord < b.ycoord AND a.xcoord < b.xcoord ");
-		sql.append("WHERE a.id_region = :idRegion and b.id_region = :idRegion ");
-		sql.append("ORDER BY a.id, a.xcoord, a.ycoord, b.xcoord, b.ycoord, ST_DISTANCESPHERE(a.geom, b.geom) ");
+		sql.append("SELECT M.id MID, M.xcoord MX, M.ycoord MY, A.id AID, A.xcoord AX, A.ycoord AY FROM ");
+		sql.append("coordinates M, coordinates A ");
+		sql.append("JOIN coordinatesxregion CXR ON CXR.id_region = :idRegion AND CXR.id_coordinates = A.id ");
+		sql.append("WHERE m.id = (SELECT id_middle_coord FROM region WHERE id = CXR.id_region) AND ");
+		sql.append("((m.xcoord < a.xcoord AND m.ycoord < a.ycoord) OR (m.xcoord > a.xcoord AND m.ycoord > a.ycoord)) ");
 
 		Query query = em.createNativeQuery(sql.toString());
 		query.setParameter("idRegion", idRegion);
@@ -41,7 +40,6 @@ public class CoordinatesDAO extends BaseDAO<Coordinates> {
 				.map(res -> SearchItem.builder()
 						.initialCoord(new Coordinates((int) res[0], (double) res[1], (double) res[2]))
 						.finalCoord(new Coordinates((int) res[3], (double) res[4], (double) res[5]))
-						.distance((double) res[6])
 						.build())
 				.collect(Collectors.toList());
 

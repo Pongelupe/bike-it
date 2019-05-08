@@ -77,7 +77,7 @@ public class App {
 						segmentDAO.persistIfNotExistsElse(segment,
 								s -> segmentHistoricalDAO.persistIfNotExists(s.toHistorical()));
 						searchItemXSegmentDAO.persist(
-								new SearchItemXSegment(new SearchItemXSegmentId(item.getId(), search.getId())));
+								new SearchItemXSegment(new SearchItemXSegmentId(item.getId(), segment.getId())));
 					} catch (RequestException e) {
 						LOGGER.severe("Eror requesting " + e.getMessage());
 					}
