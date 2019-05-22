@@ -15,8 +15,8 @@ import okhttp3.Response;
 public class RequestException extends BikeItException {
 
 	private static final long serialVersionUID = 2702002417385250444L;
-	private Request request;
-	private Optional<Response> response;
+	private final Request request;
+	private final Optional<Response> response;
 
 	public RequestException(Request request, Response response) {
 		super("Error on the http request to " + request.url());
