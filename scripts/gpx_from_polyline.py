@@ -28,25 +28,28 @@ def polyline_to_gpx(polyline = None):
     return gpx.to_xml()
 
 
-def load_polylines():
+def load_polylines(id_search):
     con = psycopg2.connect(host='localhost', database='bikeit',
             user='postgres', password='root')
     cursor = con.cursor()
     cursor.execute("""SELECT DISTINCT POLYLINE FROM SEGMENT S 
                 JOIN SEARCH_ITEMXSEGMENT SIXS ON SIXS.ID_SEGMENT = S.ID
-                """)
+                JOIN SEARCH_ITEM SI ON SI.ID = SIXS.ID_SEARCH_ITEM
+                WHERE SI.ID_SEARCH = %s
+                """, (id_search,))
     recset = cursor.fetchall()
+    os.mkdir(f'gpx/{id_search}')
     i = 0
     for rec in recset:
         i+=1
         now = datetime.datetime.now()
-        f = open(f'gpx/{i}_{now}.gpx', 'w')
+        f = open(f'gpx/{id_search}/{i}_{now}.gpx', 'w')
         f.write(polyline_to_gpx(rec[0]))
-        print(f'{i} - persisted @ gpx/{i}_{now}.gpx')
+        print(f'{i} - persisted @ gpx/{id_search}/{i}_{now}.gpx')
         f.close()
 
 
 if __name__ == '__main__':
     os.makedirs("gpx", exist_ok=True)
-    load_polylines();
+    load_polylines(sys.argv[1]);
 
