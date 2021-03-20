@@ -2,7 +2,7 @@ unicorn==19.5.0
 polyline==1.1
 gpxpy==0.9.8
 Werkzeug==0.15.3
-Jinja2==2.7.3
+Jinja2==2.11.3
 MarkupSafe==0.23
 itsdangerous==0.24
 six==1.8.0
